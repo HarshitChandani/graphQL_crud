@@ -86,15 +86,28 @@ const Mutations = new GraphQLObjectType({
             }
          }
       },
-      // pending
       updateUser:{
          type: user_schema,
          args:{
-            id:{type:GraphQLInt}
+            id:{type:GraphQLInt},
+            username:{type:GraphQLString},
+            email:{type:GraphQLString},
          },
-         resolve(parents,args){
+         async resolve(parents,args){
+            let startIndex = 1;
+            // Code to create Update Query Statment according to the arguments passed
             let queryStr = 'UPDATE [dbo].[user] SET ';
-            return 'Hello'
+            const UpdateRequiredColumns = Object.keys(args);
+            
+            if (UpdateRequiredColumns.length > 1){
+               for (let index = startIndex; index < UpdateRequiredColumns.length; index++){
+                  queryStr = queryStr.concat(`${UpdateRequiredColumns[index]}='${args[UpdateRequiredColumns[index]]}'`,",")  
+               }
+            }
+            queryStr = queryStr.substring(0,queryStr.length -1 );
+            queryStr = queryStr.concat(` WHERE  ${UpdateRequiredColumns[0]}=${args[UpdateRequiredColumns[0]]}`)
+            const data = await sqlExecuteQuery(queryStr);
+            console.log(data);
          }
       }
    }
